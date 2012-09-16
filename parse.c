@@ -1,11 +1,14 @@
 
 #include "parse.h"
-#include "joblist.h"
 #include <stdlib.h>
+#include <string.h>
 
 const unsigned int MAX_INPUT_LENGTH = 4096; 
 
-int parse_file(FILE *fp)
+
+int process_statement(char *start, char *end);
+
+int parse_line(FILE *fp)
 {
 	char input[MAX_INPUT_LENGTH];
 	if (fgets(input,MAX_INPUT_LENGTH,fp))
@@ -42,7 +45,7 @@ int parse_file(FILE *fp)
 
 int process_statement(char *start, char *end)
 {
-	if (start <= end) return -1; // Empty
+	if (start > end) return -1; // Empty
 	
 	char *buff = NULL;
 	buff = malloc(  (end - start) + 2 );
@@ -53,7 +56,7 @@ int process_statement(char *start, char *end)
 	// buff is now a valid string
 	
 	
-	
+	printf("[%s]\n",buff);
 	
 	
 	if (buff != NULL)
@@ -63,5 +66,5 @@ int process_statement(char *start, char *end)
 	}
 	
 	
-	
+	return 0;
 }
