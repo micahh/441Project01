@@ -6,6 +6,12 @@ CFLAGS = -Wall -g -std=gnu99
 
 
 
+myshell : main.o parse.o executor.o
+	$(CC) -o $@ $^
+
+main.o : main.c parse.h
+	$(CC) $(CFLAGS) -o $@ -c $<
+
 parsetest : parsetest.o parse.o
 	$(CC) -o $@ $^
 	
@@ -17,6 +23,7 @@ parse.o : parse.c parse.h joblist.h executor.h
 	
 executor.o : executor.c executor.h joblist.h
 	$(CC) $(CFLAGS) -o $@ -c $<
+
 	
 clean : 
 	$(RM) parsetest *.o

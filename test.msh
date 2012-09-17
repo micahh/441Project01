@@ -1,0 +1,8 @@
+
+cmd1 parm parm parm
+cmd2 parm parm; cmd 3 parm
+cmd4 &
+do-something& something-else
+exit
+
+echo 'this wasn't reached'
