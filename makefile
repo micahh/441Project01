@@ -12,7 +12,7 @@ parsetest : parsetest.o parse.o
 parsetest.o : parsetest.c parse.h
 	$(CC) $(CFLAGS) -o $@ -c $<
 	
-parse.o : parse.c parse.h
+parse.o : parse.c parse.h joblist.h
 	$(CC) $(CFLAGS) -o $@ -c $<
 	
 clean : 

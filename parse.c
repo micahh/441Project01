@@ -1,5 +1,6 @@
 
 #include "parse.h"
+#include "joblist.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -55,7 +56,7 @@ int process_statement(char *start, char *end)
 	buff[ (end - start) + 1] = '\0';
 	
 	// buff is now a valid string containing a single 'command'
-	printf("[%s]\n",buff);
+	printf("[%s]\n",buff); // DEBUG ONLY
 	
 	// tokenize the command
 	char *temp_str = NULL;
@@ -75,27 +76,82 @@ int process_statement(char *start, char *end)
 	}
 	
 	
-	printf("%d parameters tokenized.\n",num_params);
-	
-	for(int i = 0; i < num_params; i++)
-	{
-		printf("%d) %s\n",i,params[i]);
-	}
+	printf("%d parameters tokenized.\n",num_params); // DEBUG ONLY
 	
 	// check there is at least one non-empty parameter
 	
-	// check for special instructions (exit, jobs)
+	
+	if (num_params > 0)
+	{
+		jobtype_t jobtype;
+		
+		if (strlen(params[num_params - 1]) == 1)
+		{
+			// Last parameter is a single character, see if it was & or ;
+			// and if so, remove that parameter and set jobtype
+			if (*params[num_params - 1] == '&')
+			{
+				jobtype = PARALLEL;
+				num_params--;
+			}
+			else if (*params[num_params - 1] == ';')
+			{
+				jobtype = SEQUENTIAL;
+				num_params--;
+			}
+			else
+				jobtype = SEQUENTIAL;
+		}
+		else
+		{
+			// See if last parameter ENDS with & or ;
+			// and if so, cut it off and set jobtype
+			int len = strlen(params[num_params - 1]);
+			if (params[num_params - 1][len - 1] == '&')
+			{
+				params[num_params - 1][len - 1] = '\0';
+				jobtype = PARALLEL;
+			}
+			else if (params[num_params - 1][len - 1] == ';')
+			{
+				params[num_params - 1][len - 1] = '\0';
+				jobtype = SEQUENTIAL;
+			}
+			else
+				jobtype = SEQUENTIAL;
+		}
+			
+		for(int i = 0; i < num_params; i++) // DEBUG ONLY
+		{
+			printf("%d) %s\n",i,params[i]);
+		}
+		if (jobtype == SEQUENTIAL) printf("SEQUENTIAL\n"); // DEBUG ONLY
+		if (jobtype == PARALLEL) printf("PARALLEL\n"); // DEBUG ONLY
 	
 	
-	// Find number of params, check for &
-	
-	
-	// Build job
-	
-	
-	// Submit job
-	
-	
+		// check for special instructions (exit, jobs)
+		if (num_params > 0)
+		{
+			if (!strcmp(params[0],"jobs"))
+			{
+				// Display jobs list?
+			}
+			else if (!strcmp(params[0],"exit"))
+			{
+				// Exit code
+			}
+			else
+			{
+				// Build Job
+				
+				
+				
+				// Submit job
+			
+			
+			}
+		}
+	}
 	
 	if (params != NULL)
 	{
