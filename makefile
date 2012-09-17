@@ -2,7 +2,7 @@
 # A simple makefile for 'circ.c'
 
 CC = gcc
-CFLAGS = -Wall -g -std=c99
+CFLAGS = -Wall -g -std=gnu99
 
 
 
