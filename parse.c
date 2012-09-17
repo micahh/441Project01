@@ -1,6 +1,7 @@
 
 #include "parse.h"
 #include "joblist.h"
+#include "executor.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -8,6 +9,9 @@ const unsigned int MAX_INPUT_LENGTH = 4096;
 const unsigned int MAX_NUM_PARAMS = 2048; 
 
 int process_statement(char *start, char *end);
+char *copy_string(char *start, char *end);
+char **tokenize_string(char *buff, int *num_params);
+jobtype_t get_jobtype(char **params, int *num_params);
 
 int parse_line(FILE *fp)
 {
@@ -47,33 +51,16 @@ int parse_line(FILE *fp)
 int process_statement(char *start, char *end)
 {
 	// Isolate the command and copy it to a string
-	if (start > end) return -1; // Empty
-	
-	char *buff = NULL;
-	buff = malloc(  (end - start) + 2 );
-	
-	memcpy(buff,start,(end - start) + 1);
-	buff[ (end - start) + 1] = '\0';
+	char *buff = copy_string(start,end);
+	if (buff == NULL) return -1;
 	
 	// buff is now a valid string containing a single 'command'
 	printf("[%s]\n",buff); // DEBUG ONLY
 	
 	// tokenize the command
-	char *temp_str = NULL;
 	int num_params = 0;
 	char **params = NULL;
-
-	for(temp_str = strtok(buff, " \t"); temp_str != NULL; temp_str = strtok(NULL, " \t"))
-	{
-		params = (char**)realloc(params, (sizeof(char*) * (num_params + 1)));
-		if (params == NULL)
-		{
-			fprintf(stderr, "Fatal error allocating storage while parsing.");
-			// TODO: exit program...
-		}
-		params[num_params] = strdup(temp_str);
-		num_params++;
-	}
+	params = tokenize_string(buff, &num_params);
 	
 	
 	printf("%d parameters tokenized.\n",num_params); // DEBUG ONLY
@@ -83,43 +70,7 @@ int process_statement(char *start, char *end)
 	
 	if (num_params > 0)
 	{
-		jobtype_t jobtype;
-		
-		if (strlen(params[num_params - 1]) == 1)
-		{
-			// Last parameter is a single character, see if it was & or ;
-			// and if so, remove that parameter and set jobtype
-			if (*params[num_params - 1] == '&')
-			{
-				jobtype = PARALLEL;
-				num_params--;
-			}
-			else if (*params[num_params - 1] == ';')
-			{
-				jobtype = SEQUENTIAL;
-				num_params--;
-			}
-			else
-				jobtype = SEQUENTIAL;
-		}
-		else
-		{
-			// See if last parameter ENDS with & or ;
-			// and if so, cut it off and set jobtype
-			int len = strlen(params[num_params - 1]);
-			if (params[num_params - 1][len - 1] == '&')
-			{
-				params[num_params - 1][len - 1] = '\0';
-				jobtype = PARALLEL;
-			}
-			else if (params[num_params - 1][len - 1] == ';')
-			{
-				params[num_params - 1][len - 1] = '\0';
-				jobtype = SEQUENTIAL;
-			}
-			else
-				jobtype = SEQUENTIAL;
-		}
+		jobtype_t jobtype = get_jobtype(params,&num_params);
 			
 		for(int i = 0; i < num_params; i++) // DEBUG ONLY
 		{
@@ -167,4 +118,88 @@ int process_statement(char *start, char *end)
 	
 	
 	return 0;
+}
+
+// Copies a portion of memory form start to end into a new string
+// Length will be increased by 1 for a null termination
+char *copy_string(char *start, char *end)
+{
+	if (start > end) return NULL; // Empty
+	
+	char *buff = NULL;
+	buff = malloc(  (end - start) + 2 );
+	
+	memcpy(buff,start,(end - start) + 1);
+	buff[ (end - start) + 1] = '\0';
+	
+	return buff;
+}
+
+
+// Tokenizes a string, calling strdup (and thus malloc) for each
+// token and also allocs the 2d string array.
+char **tokenize_string(char *buff, int *num_params)
+{
+	char *temp_str = NULL;
+	char **params = NULL;
+	
+	for(temp_str = strtok(buff, " \t"); temp_str != NULL; temp_str = strtok(NULL, " \t"))
+	{
+		params = (char**)realloc(params, (sizeof(char*) * ((*num_params) + 1)));
+		if (params == NULL)
+		{
+			fprintf(stderr, "Fatal error allocating storage while parsing.");
+			// TODO: exit program...
+		}
+		// TODO: Can we eliminate strdup here, and duplicate INTO the jobs?
+		params[*num_params] = strdup(temp_str);
+		(*num_params)++;
+	}
+	return params;
+}
+
+// Analyzes the tokens to find the jobtype of the command
+// by looking for & or ; symbols at the end. WILL modify
+// the num_params value, and/or erase the symbols from params
+// as necessary. 
+jobtype_t get_jobtype(char **params, int *num_params)
+{
+	jobtype_t jobtype;
+		
+		if (strlen(params[(*num_params) - 1]) == 1)
+		{
+			// Last parameter is a single character, see if it was & or ;
+			// and if so, remove that parameter and set jobtype
+			if (*params[(*num_params) - 1] == '&')
+			{
+				jobtype = PARALLEL;
+				(*num_params)--;
+			}
+			else if (*params[(*num_params) - 1] == ';')
+			{
+				jobtype = SEQUENTIAL;
+				(*num_params)--;
+			}
+			else
+				jobtype = SEQUENTIAL;
+		}
+		else
+		{
+			// See if last parameter ENDS with & or ;
+			// and if so, cut it off and set jobtype
+			int len = strlen(params[(*num_params) - 1]);
+			if (params[(*num_params) - 1][len - 1] == '&')
+			{
+				params[(*num_params) - 1][len - 1] = '\0';
+				jobtype = PARALLEL;
+			}
+			else if (params[(*num_params) - 1][len - 1] == ';')
+			{
+				params[(*num_params) - 1][len - 1] = '\0';
+				jobtype = SEQUENTIAL;
+			}
+			else
+				jobtype = SEQUENTIAL;
+		}
+	return jobtype;
 }
