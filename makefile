@@ -1,5 +1,5 @@
 
-# A simple makefile for 'circ.c'
+# A simple makefile for 'myshell'
 
 CC = gcc
 CFLAGS = -Wall -g -std=gnu99

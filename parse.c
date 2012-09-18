@@ -5,8 +5,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+/********************* parse.c *******************************************
+ * Author: Charles Goetzman
+ * Date: 09/17/12
+ * Description: This file handles reading input strings and convering them
+ *			into job_t structures. It also identifies the special commands
+ *			'exit' and 'jobs'.
+ *
+ ************************************************************************/
+
 const unsigned int MAX_INPUT_LENGTH = 4096; 
-const unsigned int MAX_NUM_PARAMS = 2048; 
 
 int process_statement(char *start, char *end);
 char *copy_string(char *start, char *end);
@@ -168,9 +176,8 @@ char **tokenize_string(char *buff, int *num_params)
 		if (params == NULL)
 		{
 			fprintf(stderr, "Fatal error allocating storage while parsing.");
-			// TODO: exit program...
+			exit(1);
 		}
-		// TODO: Can we eliminate strdup here, and duplicate INTO the jobs?
 		//params[*num_params] = strdup(temp_str);
 		params[*num_params] = temp_str;
 		(*num_params)++;
