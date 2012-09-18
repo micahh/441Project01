@@ -55,7 +55,7 @@ int process_statement(char *start, char *end)
 	if (buff == NULL) return -1;
 	
 	// buff is now a valid string containing a single 'command'
-	printf("[%s]\n",buff); // DEBUG ONLY
+	//printf("[%s]\n",buff); // DEBUG ONLY
 	
 	// tokenize the command
 	int num_params = 0;
@@ -63,7 +63,7 @@ int process_statement(char *start, char *end)
 	params = tokenize_string(buff, &num_params);
 	
 	
-	printf("%d parameters tokenized.\n",num_params); // DEBUG ONLY
+	//printf("%d parameters tokenized.\n",num_params); // DEBUG ONLY
 	
 	// check there is at least one non-empty parameter
 	
@@ -71,14 +71,15 @@ int process_statement(char *start, char *end)
 	if (num_params > 0)
 	{
 		jobtype_t jobtype = get_jobtype(params,&num_params);
-			
+		
+		/*
 		for(int i = 0; i < num_params; i++) // DEBUG ONLY
 		{
 			printf("%d) %s\n",i,params[i]);
 		}
 		if (jobtype == SEQUENTIAL) printf("SEQUENTIAL\n"); // DEBUG ONLY
 		if (jobtype == PARALLEL) printf("PARALLEL\n"); // DEBUG ONLY
-	
+		*/
 	
 		// check for special instructions (exit, jobs)
 		if (num_params > 0)
@@ -90,16 +91,34 @@ int process_statement(char *start, char *end)
 			else if (!strcmp(params[0],"exit"))
 			{
 				// Exit code
+				exit(0);
 			}
 			else
 			{
 				// Build Job
-				
-				
+				job_t *job = malloc(sizeof(job_t));
+				job->job_state = WAITING;
+				job->job_type = jobtype;
+				job->pid = 0; // necessary?
+				job->prog_name = strdup(params[0]);
+				if (num_params > 1)
+				{
+					job->params = malloc(sizeof(char *) * (num_params - 1));
+					for(int i = 1; i < num_params; i++)
+					{
+						job->params[i - 1] = strdup(params[i]);
+					}
+					job->size_params = num_params - 1;
+				}
+				else
+				{
+					job->params = NULL;
+					job->size_params = 0;
+				}
+				job->job_n = -1; // Will be filled in by start method...
 				
 				// Submit job
-			
-			
+				start_job(job);
 			}
 		}
 	}
@@ -120,7 +139,7 @@ int process_statement(char *start, char *end)
 	return 0;
 }
 
-// Copies a portion of memory form start to end into a new string
+// Copies a portion of memory from start to end into a new string
 // Length will be increased by 1 for a null termination
 char *copy_string(char *start, char *end)
 {
@@ -152,7 +171,8 @@ char **tokenize_string(char *buff, int *num_params)
 			// TODO: exit program...
 		}
 		// TODO: Can we eliminate strdup here, and duplicate INTO the jobs?
-		params[*num_params] = strdup(temp_str);
+		//params[*num_params] = strdup(temp_str);
+		params[*num_params] = temp_str;
 		(*num_params)++;
 	}
 	return params;
