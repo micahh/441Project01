@@ -7,7 +7,8 @@ static int job_counter = 0;
 /* Returns the next available job number.
  * The first job nubmer is always 1.
  */
-int get_next_job_number(){
+int get_next_job_number()
+{
 	return ++job_counter;
 }
 
@@ -25,7 +26,8 @@ int start_job(job_t *job)
 		parallel_char = '*';
 
 	printf("Job %d%c: <%s> ",job->job_n,parallel_char,job->prog_name);
-	for(size_t i = 0;i < job->size_params;++i){
+	for(size_t i = 0;i < job->size_params;++i)
+	{
 		printf("[%s] ",job->params[i]);
 	}
 	printf("\n");

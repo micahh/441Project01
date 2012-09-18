@@ -5,7 +5,8 @@
 
 const char* DEFAULT_SHELL_NAME="my_shell";
 
-int main(int argc,char** argv){
+int main(int argc,char** argv)
+{
 	
 
 	/*check to see if there are any input files to run in batch mode */
