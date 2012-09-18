@@ -43,9 +43,9 @@ typedef struct job_t
 int add_job(job_t* job); //add a job to the job list.
 int update_job_list_state();	// updates the state of each job in the job list.
 void print_job_list();			// print out job information for every job in the job list.
+int free_job();					// deallocates job object. returns zero if deallocation was sucessful.
 int clean_job_list();		// remove all completed jobs from job list. Jobs are deleted (de-allocated) when removed.
 
-int get_next_job_number(); //returns the next available job number.
 
 
 #endif

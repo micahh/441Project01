@@ -4,7 +4,6 @@
 
 static job_t root = {RUNNING,BUILT_IN,0,NULL,NULL,0,0,NULL};
 static size_t job_list_size = 0;
-static int job_counter = 0;
 
 
 
@@ -18,6 +17,24 @@ int add_job(job_t* job){
 	return 0;
 }
 
+
+int free_job(job_t* job){
+	if(NULL == job) return -1;
+
+	if(job->prog_name != NULL)free(job->prog_name);
+	job->prog_name = NULL;
+
+	if(job->params != NULL){
+		for(size_t i = 0; i < job->size_params; ++i){
+			if(job->params[i] != NULL) free(job->params[i]);
+			job->params[i] = NULL;
+		}
+		free(job->params);
+		job->params = NULL;
+	}
+	free(job);
+	return 0;
+}
 /* removes the job 'job' from the list and frees the memory pointed to it. Previous must be the
  * job immediately before 'job'. */
 int remove_job(job_t* prev,job_t* job){
@@ -25,18 +42,7 @@ int remove_job(job_t* prev,job_t* job){
 	prev->next = job->next;
 			/*de-allocate job */
 			job->next = NULL;
-			if(job->prog_name != NULL)free(job->prog_name);
-			job->prog_name = NULL;
-
-			if(job->params != NULL){
-				for(size_t i = 0; i < job->size_params; ++i){
-					if(job->params[i] != NULL) free(job->params[i]);
-					job->params[i] = NULL;
-				}
-				free(job->params);
-				job->params = NULL;
-			}
-			free(job);
+			free_job(job);
 			--job_list_size;
 			return 0;
 	return -1; // object not found
@@ -74,6 +80,3 @@ void print_job_list(){
 	}
 }
 
-int get_next_job_number(){
-	return ++job_counter;
-}

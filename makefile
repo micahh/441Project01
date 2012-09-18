@@ -6,7 +6,7 @@ CFLAGS = -Wall -g -std=gnu99
 
 
 
-myshell : main.o parse.o executor.o
+myshell : main.o parse.o executor.o joblist.o
 	$(CC) -o $@ $^
 
 main.o : main.c parse.h
@@ -16,6 +16,9 @@ parse.o : parse.c parse.h joblist.h executor.h
 	$(CC) $(CFLAGS) -o $@ -c $<
 	
 executor.o : executor.c executor.h joblist.h
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+joblist.o : joblist.c joblist.h
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 	
