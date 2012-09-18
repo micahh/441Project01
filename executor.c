@@ -18,6 +18,7 @@ int start_job(job_t *job)
 
 	/* Assign a job number to job be for we start it */
 	job->job_n = get_next_job_number();
+	job->job_state = RUNNING;
 
 	/* print out job information for part 1*/
 	/* conditionally display a * to indicate a job is executed in parallel */

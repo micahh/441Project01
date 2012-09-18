@@ -6,7 +6,7 @@ static job_t root = {RUNNING,BUILT_IN,0,NULL,NULL,0,0,NULL};
 static size_t job_list_size = 0;
 
 
-
+/* adds the job 'job' to the joblist structure */
 int add_job(job_t* job)
 {
 	if(NULL == job) return -1;
@@ -19,6 +19,11 @@ int add_job(job_t* job)
 }
 
 
+/* de-allocates the job referenced by 'job'.
+ * Note: this function doesn't remove the job from the job list.
+ * 		 It is assumed to not belong to the joblist. remove_job 
+ * 		 should be used insteade to remove  a job from the job list.
+ */
 int free_job(job_t* job)
 {
 	if(NULL == job) return -1;
@@ -40,7 +45,9 @@ int free_job(job_t* job)
 	return 0;
 }
 /* removes the job 'job' from the list and frees the memory pointed to it. Previous must be the
- * job immediately before 'job'. */
+ * job immediately before 'job'.
+ * Returns non-zero if job couldn't be removed.
+ */
 int remove_job(job_t* prev,job_t* job)
 {
 	if(NULL == job || NULL == prev || prev->next != job) return -1; 
@@ -53,6 +60,7 @@ int remove_job(job_t* prev,job_t* job)
 	return -1; // object not found
 }
 
+/* Update the state of each job in the job list */
 int update_job_list_state()
 {
 	for(job_t* j = &root; j->next != NULL; j = j->next)
@@ -62,6 +70,7 @@ int update_job_list_state()
 	return 0;
 }
 
+/* removes all completed jobs from the job list */
 int clean_job_list()
 {
 	for(job_t* j = &root; j->next != NULL;)
@@ -78,6 +87,7 @@ int clean_job_list()
 	return 0;
 }
 
+/* prints all current jobs */
 void print_job_list()
 {
 	for(job_t* j = &root; j->next != NULL; j = j->next)
