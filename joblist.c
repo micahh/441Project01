@@ -3,7 +3,7 @@
 #include "joblist.h"
 
 static job_t root = {RUNNING,BUILT_IN,0,NULL,NULL,0,0,NULL};
-static size_t job_list_size = 0;
+static uint32_t job_list_size = 0;
 
 
 /* adds the job 'job' to the joblist structure */
@@ -33,7 +33,7 @@ int free_job(job_t* job)
 
 	if(job->params != NULL)
 	{
-		for(size_t i = 0; i < job->size_params; ++i)
+		for(uint32_t i = 0; i < job->size_params; ++i)
 		{
 			if(job->params[i] != NULL) free(job->params[i]);
 			job->params[i] = NULL;
@@ -95,7 +95,7 @@ void print_job_list()
 		job_t* cur = j->next;
 		if(cur->job_type == PARALLEL)printf("Job %d*: <%s> ",cur->job_n,cur->prog_name);
 		else printf("Job %d : <%s> ",cur->job_n,cur->prog_name);
-		for(size_t i = 0;i < cur->size_params;++i)
+		for(uint32_t i = 0;i < cur->size_params;++i)
 		{
 			printf("[%s] ",cur->params[i]);
 		}
