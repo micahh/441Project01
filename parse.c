@@ -19,8 +19,8 @@ const unsigned int MAX_INPUT_LENGTH = 4096;
 
 int process_statement(char *start, char *end);
 char *copy_string(char *start, char *end);
-char **tokenize_string(char *buff, int32_t *num_params);
-jobtype_t get_jobtype(char **params, int32_t *num_params);
+char **tokenize_string(char *buff, uint32_t *num_params);
+jobtype_t get_jobtype(char **params, uint32_t *num_params);
 
 int parse_line(FILE *fp)
 {
@@ -34,7 +34,7 @@ int parse_line(FILE *fp)
 			if (*end == '\0' || *end == '\n') // end of input
 			{
 				// Process line
-				if (process_statement(start,end - 1))//don't include the null or newline
+				if (process_statement(start,end ))//don't include the null or newline
 					return -1;
 				// Done
 				break;
@@ -69,7 +69,7 @@ int process_statement(char *start, char *end)
 	// buff is now a valid string containing a single 'command'
 	
 	// tokenize the command
-	int32_t num_params = 0;
+	uint32_t num_params = 0;
 	char **params = NULL;
 	params = tokenize_string(buff, &num_params);
 	
@@ -83,11 +83,12 @@ int process_statement(char *start, char *end)
 		if (!strcmp(params[0],"jobs"))
 		{
 			// Display jobs list?
+			list_jobs();
 		}
 		else if (!strcmp(params[0],"exit"))
 		{
 			// Exit code
-			
+			exit_notify();
 			exit = 1;
 		}
 		else
@@ -154,12 +155,12 @@ char *copy_string(char *start, char *end)
 
 // Tokenizes a string, calling strdup (and thus malloc) for each
 // token and also allocs the 2d string array.
-char **tokenize_string(char *buff, int32_t *num_params)
+char **tokenize_string(char *buff, uint32_t *num_params)
 {
 	char *temp_str = NULL;
 	char **params = NULL;
 	
-	for(temp_str = strtok(buff, " \t"); temp_str != NULL; temp_str = strtok(NULL, " \t"))
+	for(temp_str = strtok(buff, " \t\n\0"); temp_str != NULL; temp_str = strtok(NULL, " \t\n\0"))
 	{
 		params = (char**)realloc(params, (sizeof(char*) * ((*num_params) + 1)));
 		if (params == NULL)
@@ -178,7 +179,7 @@ char **tokenize_string(char *buff, int32_t *num_params)
 // by looking for & or ; symbols at the end. WILL modify
 // the num_params value, and/or erase the symbols from params
 // as necessary. 
-jobtype_t get_jobtype(char **params, int32_t *num_params)
+jobtype_t get_jobtype(char **params, uint32_t *num_params)
 {
 	jobtype_t jobtype = 0;
 	// If there are no parameters, return default jobtype
