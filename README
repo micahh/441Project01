@@ -1,0 +1,70 @@
+myshell version 1
+
+Description
+===================================================================================================
+ This program is a simple system shell program. It allows entering commands in both interactive mode and in the form of a batch file. This version does not actually execute commands but rather provides a foundation for a later project to build upon. Instead of executing commands that the user enters, information about the commands are printed to standard out.
+
+
+Building
+===================================================================================================
+A makefile is provide for compilation. It assumes a recent version of gcc is installed that supports the c99 standard. To build type:
+
+	make
+
+In a terminal in the source directory.
+ To clean the source directory type:
+	make clean
+
+In a terminal.
+
+Running myshell
+===================================================================================================
+To run in interactive mode, type
+
+	./myshell
+
+In the source directory. This will display a prompt that consists of the users login followed by a '$'.
+
+To run in batch mode, invoke the program in the same manner followed by one or more text files containing commands to be executed by the shell:
+
+	./myshell batch.sh batch2.sh batch3.sh
+
+Each file will be executed in sequence. If the 'exit' command is present in any of the files, the shell will immediately stop processing commands in the current file and proceed to process the next file (if any).
+
+Examples
+===================================================================================================This is an example of a user 'jack' running myshell in interactive mode:
+
+	jack@home$ ./myshell
+	jack$ ls -a
+	Job 1 : <ls> [-a] 
+	jack$ killall emacs; vim; cat file1 file2 > /dev/null
+	Job 2 : <killall> [emacs] 
+	Job 3 : <vim> 
+	Job 4 : <cat> [file1] [file2] [>] [/dev/null] 
+	jack$ exit
+	jack@home$
+
+The same could be accomplished using a batch file. Assuming that there is a file named 'batch.sh' that looks like:
+
+	ls -a
+	killall emacs; vim
+	cat file1 file2 > /dev/null
+
+Then the executing the shell in batch mode would produce the following:
+
+	jack@home$ ./myshell batch.sh
+	Job 1 : <ls> [-a] 
+	Job 2 : <killall> [emacs] 
+	Job 3 : <vim> 
+	Job 4 : <cat> [file1] [file2] [>] [/dev/null]  
+	jack@home$ 
+
+
+
+Know Bugs and Limitations
+===================================================================================================
+Maximum input for a given line is 4095 bytes.
+
+Typing control-D when the prompt is non empty (i.e. the user has typed something in the current line), results in the program not terminating.  Pressing control-D twice is equivalent to hitting the enter key except the newline character is not present.
+
+
