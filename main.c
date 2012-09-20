@@ -1,21 +1,30 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "parse.h"
 
 const char* DEFAULT_SHELL_NAME="my_shell";
 
-int main(int argc,char** argv){
+int main(int argc,char** argv)
+{
 	
 
 	/*check to see if there are any input files to run in batch mode */
 	if(argc > 1)
 	{
-		for(size_t i = 1;i < argc; ++i)
+		for(uint32_t i = 1;i < argc; ++i)
 		{
 			FILE* inputf = fopen(argv[i],"r");
+			if(inputf == NULL)
+			{
+				fprintf(stderr, "Error: could not open file '%s'.\n",argv[i]);
+				continue;
+			}
 
 			while(!parse_line(inputf));
+
+			fclose(inputf);
 		}
 	}
 	else //interactive mode

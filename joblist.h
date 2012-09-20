@@ -2,6 +2,7 @@
 #define JOBLIST_H
 
 #include <sys/types.h>
+#include <stdint.h>
 #include <stddef.h>
 
 /********************* joblist.h *****************************
@@ -35,8 +36,8 @@ typedef struct job_t
 	pid_t pid;			// pid associated
 	char* prog_name;	// Name of program
 	char** params;		// array of string parameters for job 
-	size_t size_params; // size of the parameter array
-	size_t job_n;		// the job number
+	uint32_t size_params; // size of the parameter array
+	uint32_t job_n;		// the job number
 	struct job_t* next;		// next job in job list
 } job_t;
 
