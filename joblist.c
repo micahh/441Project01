@@ -10,8 +10,10 @@ static uint32_t job_list_size = 0;
 int add_job(job_t* job)
 {
 	if(NULL == job) return -1;
+
 	job_t* tail = &root;
 	for(; tail->next != NULL; tail = tail->next); //move to end of list
+
 	tail->next = job;
 	++job_list_size;
 
@@ -29,6 +31,7 @@ int free_job(job_t* job)
 	if(NULL == job) return -1;
 
 	if(job->prog_name != NULL)free(job->prog_name);
+
 	job->prog_name = NULL;
 
 	if(job->params != NULL)
@@ -52,12 +55,11 @@ int remove_job(job_t* prev,job_t* job)
 {
 	if(NULL == job || NULL == prev || prev->next != job) return -1; 
 	prev->next = job->next;
-			/*de-allocate job */
-			job->next = NULL;
-			free_job(job);
-			--job_list_size;
-			return 0;
-	return -1; // object not found
+	/*de-allocate job */
+	job->next = NULL;
+	free_job(job);
+	--job_list_size;
+	return 0;
 }
 
 /* Update the state of each job in the job list */
@@ -79,6 +81,7 @@ int clean_job_list()
 		{
 			int error = remove_job(j,j->next);
 			if(error) return error;
+
 			continue;
 		}
 	   	j = j->next;
@@ -93,8 +96,10 @@ void print_job_list()
 	for(job_t* j = &root; j->next != NULL; j = j->next)
 	{
 		job_t* cur = j->next;
-		if(cur->job_type == PARALLEL)printf("Job %d*: <%s> ",cur->job_n,cur->prog_name);
+		if(cur->job_type == PARALLEL)
+			printf("Job %d*: <%s> ",cur->job_n,cur->prog_name);
 		else printf("Job %d : <%s> ",cur->job_n,cur->prog_name);
+
 		for(uint32_t i = 0;i < cur->size_params;++i)
 		{
 			printf("[%s] ",cur->params[i]);

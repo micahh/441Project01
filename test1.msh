@@ -1,4 +1,4 @@
 ls -a
 killall myshell
-top
+jobs
 exit
