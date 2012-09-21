@@ -7,6 +7,15 @@
 #include "joblist.h"
 #include "executor.h"
 
+/********************* parse.c *******************************************
+ * Author: Charles Goetzman and Micah Heyer
+ * Date: 09/18/12
+ * Description: These functions handle starting jobs and keeping track of job
+				numbers.
+ *
+ ************************************************************************/
+
+
 static uint32_t job_counter = 0;
 static uint32_t jobs_started = 0;
 static uint32_t jobs_background = 0;

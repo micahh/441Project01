@@ -58,6 +58,36 @@ Then the executing the shell in batch mode would produce the following:
 	Job 3 : <vim> 
 	Job 4 : <cat> [file1] [file2] [>] [/dev/null]  
 	jack@home$ 
+	
+	
+Example of interactive shell from Project01 documentation:
+
+	user@build:~/shared/os/441Project01$ ./myshell
+	user$ /bin/date
+	Job   1 : </bin/date>
+	user$ /bin/pwd
+	Job   2 : </bin/pwd>
+	user$ /bin/ls assign1 ..
+	Job   3 : </bin/ls> [assign1] [..]
+	user$
+	user$ /bin/date; /bin/pwd ; /bin/ls assign1 ..
+	Job   4 : </bin/date>
+	Job   5 : </bin/pwd>
+	Job   6 : </bin/ls> [assign1] [..]
+	user$
+	user$ /bin/sleep 5 & /bin/sleep 4 & /bin/sleep 3 &
+	Job   7*: </bin/sleep> [5]
+	Job   8*: </bin/sleep> [4]
+	Job   9*: </bin/sleep> [3]
+	user$ jobs
+	Job  10^: <jobs>
+	user$
+	user$ exit
+	Job  11^: <exit>
+	Total number of jobs: 9
+	Total number of jobs in background: 3
+	user@build:~/shared/os/441Project01$
+
 
 
 
