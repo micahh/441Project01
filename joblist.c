@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "joblist.h"
 
 static job_t root = {RUNNING,BUILT_IN,0,NULL,NULL,0,0,NULL};
@@ -65,9 +67,11 @@ int remove_job(job_t* prev,job_t* job)
 /* Update the state of each job in the job list */
 int update_job_list_state()
 {
-	for(job_t* j = &root; j->next != NULL; j = j->next)
+	for(job_t* j = root.next; j != NULL; j = j->next)
 	{
-		j->job_state = DONE;
+		pid_t finished_job = waitpid(j->pid,NULL,WNOHANG);
+		if(finished_job == j->pid)
+			j->job_state = DONE;
 	}
 	return 0;
 }
@@ -75,16 +79,17 @@ int update_job_list_state()
 /* removes all completed jobs from the job list */
 int clean_job_list()
 {
-	for(job_t* j = &root; j->next != NULL;)
+	for(job_t* prev = &root; prev->next != NULL;)
 	{
-		if(j->job_state == DONE)
+		job_t* cur = prev->next;
+		if(cur->job_state == DONE)
 		{
-			int error = remove_job(j,j->next);
+			int error = remove_job(prev,cur);
 			if(error) return error;
 
-			continue;
+			continue; //we removed a element, so prev->next now points to the next element.
 		}
-	   	j = j->next;
+	   	prev = prev->next;
 	}
 
 	return 0;
