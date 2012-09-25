@@ -1,4 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "joblist.h"
 #include "executor.h"
 
@@ -23,12 +28,18 @@ uint32_t get_next_job_number()
 	return ++job_counter;
 }
 
+int execute_job(job_t* job);
+
 int list_jobs()
 {
 	//Print out the 'jobs' prompt for Part 1 of homework
-	uint32_t jobnum = get_next_job_number();
-	printf("Job %3d^: <jobs>\n",jobnum);
+	//uint32_t jobnum = get_next_job_number();
+	//printf("Job %3d^: <jobs>\n",jobnum);
 	// for part 2 will call into joblistc's list_jobs function
+	print_job_list();
+	update_job_list_state();
+	clean_job_list();
+
 	return 0;
 }
 int exit_notify()
@@ -49,43 +60,64 @@ int start_job(job_t *job)
 
 	/* Assign a job number to job be for we start it */
 	job->job_n = get_next_job_number();
-	job->job_state = RUNNING;
 	jobs_started++;
-
-	/* print out job information for part 1*/
-	/* conditionally display a * to indicate a job is executed in parallel */
-	char parallel_char = ' ';
-	if(job->job_type == PARALLEL)
-	{
-		parallel_char = '*';
-		jobs_background++;
-	}
-
-	printf("Job %3d%c: <%s> ",job->job_n,parallel_char,job->prog_name);
-	for(uint32_t i = 0;i < job->size_params;++i)
-	{
-		printf("[%s] ",job->params[i]);
-	}
-	printf("\n");
-
-	/* clean up job */
-	free_job(job);
-
-	
-	/*
 	// For PROJECT PART 2:
+	
 	
 	
 
 	// Check if the job is Parallel or Sequential
-	
+	int parallel = (job->job_type == PARALLEL);
+
 	// If serial:
 	// Simply execute the job immediately as-is, wait() on process, then free it (never used again)
-	
-	
-	// If parallel:
-	// Start the job immediately, add it to the active joblist (don't free it)
-	*/
+	pid_t c_pid = fork();
+	if(c_pid < 0)
+	{
+		fprintf(stderr, "Error: failed to fork.\n");
+		return -1;
+	}
+	else if(c_pid == 0) // child process
+	{
+		int exec_err = execute_job(job);
+		fprintf(stderr, "Error: could not execute command %s.\n", job->prog_name);
+		exit(exec_err);
+	}
+	else if(c_pid > 0)
+	{
+		int status = 0;
+		if(!parallel)
+		{
+			waitpid(c_pid,&status,0);
+			if(status != 0)
+			{
+				fprintf(stderr,"Command %s terminated with value of %d.\n",job->prog_name,status);
+				return 0;
+			}
+			free_job(job);
+		}
+		else
+		{
+			job->pid = c_pid;
+			job->job_state = RUNNING;
+			add_job(job);
+		}
+	}
 	
 	return 0;
+}
+
+int execute_job(job_t* job)
+{
+	int argc = job->size_params + 2; //number of parameters plus 1 for program name and plus 1 for NULL terminating argument.
+	char** args = (char**)malloc(sizeof(char**)*argc);
+	char* prog_name = strdup(job->prog_name);
+	args[0] = strdup(job->prog_name);
+	for(uint32_t i = 0; i < job->size_params ; ++i)
+	{
+		args[i+1] = strdup(job->params[i]);
+	}
+	args[argc-1] = NULL;
+
+	return execvp(prog_name,args);
 }
