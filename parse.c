@@ -22,6 +22,8 @@ char *copy_string(char *start, char *end);
 char **tokenize_string(char *buff, uint32_t *num_params);
 jobtype_t get_jobtype(char **params, uint32_t *num_params);
 
+// Parses and issues the jobs for a single line from a given file handle.
+// Returns 0 if not EOF, or -1 on EOF
 int parse_line(FILE *fp)
 {
 	char input[MAX_INPUT_LENGTH];
@@ -34,7 +36,7 @@ int parse_line(FILE *fp)
 			if (*end == '\0' || *end == '\n') // end of input
 			{
 				// Process line
-				if (process_statement(start,end ))//don't include the null or newline
+				if (process_statement(start,end))
 					return -1;
 				// Done
 				break;
@@ -53,15 +55,22 @@ int parse_line(FILE *fp)
 		
 	}
 	else
+	{
+		// end of file or input problem
+		exit_notify();	// dsplay current job status
 		return -1;
+	}
 
 	return 0;
 }
 
-
+// Performs all the processing on a substring that begins
+// at 'start' and finishes at 'end', the original char
+// array is not modified.
 int process_statement(char *start, char *end)
 {
-	int exit = 0;
+	int exit = 0; // This will be the return value
+	
 	// Isolate the command and copy it to a string
 	char *buff = copy_string(start,end);
 	if (buff == NULL) return -1;
@@ -153,8 +162,9 @@ char *copy_string(char *start, char *end)
 }
 
 
-// Tokenizes a string, calling strdup (and thus malloc) for each
-// token and also allocs the 2d string array.
+// Tokenizes a string, allocs the 2d string array. The individual tokens
+// are pointers into the original tokenized string, so no new storage is
+// created for the tokens themselves, only the token array.
 char **tokenize_string(char *buff, uint32_t *num_params)
 {
 	char *temp_str = NULL;
@@ -165,10 +175,9 @@ char **tokenize_string(char *buff, uint32_t *num_params)
 		params = (char**)realloc(params, (sizeof(char*) * ((*num_params) + 1)));
 		if (params == NULL)
 		{
-			fprintf(stderr, "Fatal error allocating storage while parsing.");
+			fprintf(stderr, "Fatal error allocating storage while parsing.\n");
 			exit(1);
 		}
-		//params[*num_params] = strdup(temp_str);
 		params[*num_params] = temp_str;
 		(*num_params)++;
 	}
@@ -182,7 +191,7 @@ char **tokenize_string(char *buff, uint32_t *num_params)
 jobtype_t get_jobtype(char **params, uint32_t *num_params)
 {
 	jobtype_t jobtype = 0;
-	// If there are no parameters, return default jobtype
+	// If there are no parameters, just return default jobtype
 	if (*num_params < 1) return jobtype; 
 		
 	if (strlen(params[(*num_params) - 1]) == 1)

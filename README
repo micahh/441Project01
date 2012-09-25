@@ -29,7 +29,7 @@ To run in batch mode, invoke the program in the same manner followed by one or m
 
 	./myshell batch.sh batch2.sh batch3.sh
 
-Each file will be executed in sequence. If the 'exit' command is present in any of the files, the shell will immediately stop processing commands in the current file and proceed to process the next file (if any).
+Each file will be executed in sequence. If the 'exit' command is present in any of the files, the shell will immediately stop processing commands in the current file and proceed to process the next file (if any). After each script's exit command or end of file, the current job count will be displayed, but will not be reset for any succeeding scripts.
 
 Examples
 ===================================================================================================This is an example of a user 'jack' running myshell in interactive mode:
@@ -95,6 +95,9 @@ Know Bugs and Limitations
 ===================================================================================================
 Maximum input for a given line is 4095 bytes.
 
+Only unix-style line terminators ('\n') are supported in script files. Windows style (cr & lf) will result in undefined operation, and are totally unsupported.
+
 Typing control-D when the prompt is non empty (i.e. the user has typed something in the current line), results in the program not terminating.  Pressing control-D twice is equivalent to hitting the enter key except the newline character is not present.
 
+An end of-file follows the same code path as the 'exit' command, and so the <exit> message will be displayed exactly as if the 'exit' command had been entered.
 

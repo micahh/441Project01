@@ -2,6 +2,18 @@
 #include <stdio.h>
 #include "joblist.h"
 
+
+/********************* joblist.h *****************************
+ * Author: Micah Heyer
+ * Date: 09/16/12
+ * Description: This file implements the support functions for
+ *				the job list data structure.
+ * 				This structure is used for managing the global 
+ * 				list of jobs currently being processed by the shell.
+ * 				It is implemented as a linked list.
+ *
+ *************************************************************/
+
 static job_t root = {RUNNING,BUILT_IN,0,NULL,NULL,0,0,NULL};
 static uint32_t job_list_size = 0;
 
