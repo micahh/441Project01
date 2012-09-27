@@ -36,17 +36,15 @@ int list_jobs()
 	//uint32_t jobnum = get_next_job_number();
 	//printf("Job %3d^: <jobs>\n",jobnum);
 	// for part 2 will call into joblistc's list_jobs function
-	print_job_list();
 	update_job_list_state();
+	print_job_list();
 	clean_job_list();
 
 	return 0;
 }
+
 int exit_notify()
 {
-	// Print out the 'exit' prompt for Part 1 of homework
-	uint32_t jobnum = get_next_job_number();
-	printf("Job %3d^: <exit>\n",jobnum);
 	printf("Total number of jobs: %d\n",jobs_started);
 	printf("Total number of jobs in background: %d\n",jobs_background);
 	// for part 2 will call into joblistc's list_jobs also
@@ -62,9 +60,6 @@ int start_job(job_t *job)
 	job->job_n = get_next_job_number();
 	jobs_started++;
 	// For PROJECT PART 2:
-	
-	
-	
 
 	// Check if the job is Parallel or Sequential
 	int parallel = (job->job_type == PARALLEL);

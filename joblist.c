@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/wait.h>
 #include "joblist.h"
 
 
@@ -77,9 +78,15 @@ int remove_job(job_t* prev,job_t* job)
 /* Update the state of each job in the job list */
 int update_job_list_state()
 {
-	for(job_t* j = &root; j->next != NULL; j = j->next)
+	job_t* j = root.next;
+	for(; j != NULL; j = j->next)
 	{
-		j->job_state = DONE;
+		if (j->job_state == RUNNING)
+		{
+			int status = 0;
+			if (waitpid(j->pid,&status,WNOHANG) && WIFEXITED(status))
+				j->job_state = DONE;
+		}
 	}
 	return 0;
 }
@@ -87,9 +94,10 @@ int update_job_list_state()
 /* removes all completed jobs from the job list */
 int clean_job_list()
 {
+	
 	for(job_t* j = &root; j->next != NULL;)
 	{
-		if(j->job_state == DONE)
+		if(j->next->job_state == DONE)
 		{
 			int error = remove_job(j,j->next);
 			if(error) return error;
@@ -108,14 +116,27 @@ void print_job_list()
 	for(job_t* j = &root; j->next != NULL; j = j->next)
 	{
 		job_t* cur = j->next;
-		if(cur->job_type == PARALLEL)
-			printf("Job %d*: <%s> ",cur->job_n,cur->prog_name);
-		else printf("Job %d : <%s> ",cur->job_n,cur->prog_name);
-
+		
+		printf("[%2d]   ",cur->job_n);
+		if (cur->job_state == RUNNING)
+		{
+			printf("Running   ");
+		}
+		else if (cur->job_state == DONE)
+		{
+			printf("Done      ");
+		}
+		else printf("ERR       ");
+		
+		printf("%s ",cur->prog_name);
+		
 		for(uint32_t i = 0;i < cur->size_params;++i)
 		{
-			printf("[%s] ",cur->params[i]);
+			printf("%s ",cur->params[i]);
 		}
+		
+		if(cur->job_type == PARALLEL)
+			printf("&");
 		printf("\n");
 	}
 }
