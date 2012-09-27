@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <errno.h>
 #include "joblist.h"
 #include "executor.h"
 
@@ -51,6 +52,20 @@ int exit_notify()
 	return 0;
 }
 
+int execute_job(job_t* job)
+{
+	int argc = job->size_params + 2; //number of parameters plus 1 for program name and plus 1 for NULL terminating argument.
+	char** args = (char**)malloc(sizeof(char**)*argc);
+	char* prog_name = strdup(job->prog_name);
+	args[0] = strdup(job->prog_name);
+	for(uint32_t i = 0; i < job->size_params ; ++i)
+	{
+		args[i+1] = strdup(job->params[i]);
+	}
+	args[argc-1] = NULL;
+
+	return execvp(prog_name,args);
+}
 
 int start_job(job_t *job)
 {
@@ -75,8 +90,14 @@ int start_job(job_t *job)
 	else if(c_pid == 0) // child process
 	{
 		int exec_err = execute_job(job);
-		fprintf(stderr, "Error: could not execute command %s.\n", job->prog_name);
-		exit(exec_err);
+		if(errno == ENOENT) /*file not found errors */
+		{
+			fprintf(stderr,"Error: command not found '%s'.\n", job->prog_name);
+			exit(0);
+		}
+		/* print any other errors errors */
+		fprintf(stderr, "Error: could not execute command '%s'. Error code %d.\n", job->prog_name,exec_err);
+		exit(0);
 	}
 	else if(c_pid > 0)
 	{
@@ -102,17 +123,3 @@ int start_job(job_t *job)
 	return 0;
 }
 
-int execute_job(job_t* job)
-{
-	int argc = job->size_params + 2; //number of parameters plus 1 for program name and plus 1 for NULL terminating argument.
-	char** args = (char**)malloc(sizeof(char**)*argc);
-	char* prog_name = strdup(job->prog_name);
-	args[0] = strdup(job->prog_name);
-	for(uint32_t i = 0; i < job->size_params ; ++i)
-	{
-		args[i+1] = strdup(job->params[i]);
-	}
-	args[argc-1] = NULL;
-
-	return execvp(prog_name,args);
-}
