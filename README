@@ -1,8 +1,8 @@
-myshell version 1
+myshell version 2
 
 Description
 ===================================================================================================
- This program is a simple system shell program. It allows entering commands in both interactive mode and in the form of a batch file. This version does not actually execute commands but rather provides a foundation for a later project to build upon. Instead of executing commands that the user enters, information about the commands are printed to standard out.
+ This program is a simple system shell program. It allows entering commands in both interactive mode and in the form of one or more batch file(s). 
 
 
 Building

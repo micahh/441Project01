@@ -21,6 +21,13 @@ executor.o : executor.c executor.h joblist.h
 joblist.o : joblist.c joblist.h
 	$(CC) $(CFLAGS) -o $@ -c $<
 
+
+joblist_test: joblist_test.o joblist.o
+	$(CC) -o $@ $^
+
+joblist_test.o: joblist_test.c joblist.h
+	$(CC) $(CFLAGS) -o $@ -c $<
+
 	
 clean : 
 	$(RM) myshell *.o
