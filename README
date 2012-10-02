@@ -32,63 +32,42 @@ To run in batch mode, invoke the program in the same manner followed by one or m
 Each file will be executed in sequence. If the 'exit' command is present in any of the files, the shell will immediately stop processing commands in the current file and proceed to process the next file (if any). After each script's exit command or end of file, the current job count will be displayed, but will not be reset for any succeeding scripts. The number of background jobs will also be displayed. This number should not be interpreted as the number of jobs currently running in the background, but rather the total number of jobs run in the background since the start of the program.
 
 Examples
-===================================================================================================This is an example of a user 'jack' running myshell in interactive mode:
+===================================================================================================
+This is an example of a user 'user' running myshell in interactive mode:
 
-	jack@home$ ./myshell
-	jack$ ls -a
-	Job 1 : <ls> [-a] 
-	jack$ killall emacs; vim; cat file1 file2 > /dev/null
-	Job 2 : <killall> [emacs] 
-	Job 3 : <vim> 
-	Job 4 : <cat> [file1] [file2] [>] [/dev/null] 
-	jack$ exit
-	jack@home$
+	user@home$./myshell
+	user$ ls -a
+	.   executor.c  executor.o  .gitignore  joblist.h  main.c  makefile  parse.c  parse.o      README
+	..  executor.h  .git        joblist.c   joblist.o  main.o  myshell   parse.h  parsetest.c  tests
+	user$ killall emacs
+	emacs: no process found
+	Command killall terminated with value of 256.
+	user$ pwd
+	/home/user/shared/os/441Project01
+	user$ jobs
+	user$ exit
+	Total number of jobs: 3
+	Total number of jobs in background: 0
+
 
 The same could be accomplished using a batch file. Assuming that there is a file named 'batch.sh' that looks like:
 
 	ls -a
-	killall emacs; vim
-	cat file1 file2 > /dev/null
+	killall emacs;
+	pwd
+	jobs
+	exit
 
 Then the executing the shell in batch mode would produce the following:
 
-	jack@home$ ./myshell batch.sh
-	Job 1 : <ls> [-a] 
-	Job 2 : <killall> [emacs] 
-	Job 3 : <vim> 
-	Job 4 : <cat> [file1] [file2] [>] [/dev/null]  
-	jack@home$ 
-	
-	
-Example of interactive shell from Project01 documentation:
-
-	user@build:~/shared/os/441Project01$ ./myshell
-	user$ /bin/date
-	Job   1 : </bin/date>
-	user$ /bin/pwd
-	Job   2 : </bin/pwd>
-	user$ /bin/ls assign1 ..
-	Job   3 : </bin/ls> [assign1] [..]
-	user$
-	user$ /bin/date; /bin/pwd ; /bin/ls assign1 ..
-	Job   4 : </bin/date>
-	Job   5 : </bin/pwd>
-	Job   6 : </bin/ls> [assign1] [..]
-	user$
-	user$ /bin/sleep 5 & /bin/sleep 4 & /bin/sleep 3 &
-	Job   7*: </bin/sleep> [5]
-	Job   8*: </bin/sleep> [4]
-	Job   9*: </bin/sleep> [3]
-	user$ jobs
-	Job  10^: <jobs>
-	user$
-	user$ exit
-	Job  11^: <exit>
-	Total number of jobs: 9
-	Total number of jobs in background: 3
-	user@build:~/shared/os/441Project01$
-
-
+	user@home$ ./myshell batch.sh
+	.   batch.sh    executor.h  .git        joblist.c  joblist.o  main.o    myshell  parse.h  parsetest.c  tests
+	..  executor.c  executor.o  .gitignore  joblist.h  main.c     makefile  parse.c  parse.o  README
+	emacs: no process found
+	Command killall terminated with value of 256.
+	/home/user/shared/os/441Project01
+	Total number of jobs: 3
+	Total number of jobs in background: 0
 
 Tests
 ===================================================================================================
@@ -104,7 +83,7 @@ Running->Done->Cleared out for background jobs. The high job 'count' after exit
 is due to the extra jobs from the 'echo' statements.
 
 Example output:
-user@build$ ./myshell test1.sh
+user@build$ ./myshell tests/test1.sh
 Launching sleep 5 and sleep 10 in background...
 Sleeping 2 seconds...
 Calling 'jobs'
@@ -126,7 +105,34 @@ Total number of jobs in background: 12
 
 
 
- 
+
+****** Test 3 ******
+./myshell test3.sh
+- This test checks two things:
+1) Handling of nonexistant programs (in this case /bin/invalid_program)
+2) Simple test for number of jobs run (should be 7) and background jobs (2, even though
+one fails execvp)
+An interesting note is that this batch file contains a 'jobs' command immediately after the
+execution of a nonexistant background program. Thus in the second call to jobs, it is likely
+to see "[ 6] Running /bin/invalid_program &" because the child has likely not had a chance to
+call execvp and exit. Depending on OS scheduling, it's certainly possible that the job could
+appear as Done, however.
+
+Example output:
+user@build$ ./myshell tests/test3.sh
+Error: command not found '/bin/invalid_program'.
+Second Job
+/home/user/shared/os/441Project01
+/home/user/shared/os/441Project01
+[ 5]   Running   sleep 1 &
+[ 5]   Running   sleep 1 &
+[ 6]   Running   /bin/invalid_program &               <---- This could show Done if scheduled first
+Error: command not found '/bin/invalid_program'.
+[ 5]   Running   sleep 1 &
+[ 6]   Done      /bin/invalid_program &               <---- If was Done above, will not appear here
+Total number of jobs: 7
+Total number of jobs in background: 2
+
 
 
 Know Bugs and Limitations
