@@ -23,6 +23,7 @@ static uint32_t job_list_size = 0;
 int add_job(job_t* job)
 {
 	if(NULL == job) return -1;
+	job->next = NULL;
 
 	job_t* tail = &root;
 	for(; tail->next != NULL; tail = tail->next); //move to end of list
