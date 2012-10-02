@@ -93,7 +93,40 @@ Example of interactive shell from Project01 documentation:
 Tests
 ===================================================================================================
 To ensure the proper functionality of your installation, you may run the test suite provided in the 'test' directory.
-The test suite consists of several batch scripts to run 
+The test suite consists of several batch scripts to run
+
+****** Test 1 ******
+./myshell test1.sh
+- This test checks proper operation of background checks and the 'jobs' command.
+Some sleep jobs are launched in the background, then jobs is called periodically
+separated by sequential sleep statements, to illustrate the transition from
+Running->Done->Cleared out for background jobs. The high job 'count' after exit
+is due to the extra jobs from the 'echo' statements.
+
+Example output:
+user@build$ ./myshell test1.sh
+Launching sleep 5 and sleep 10 in background...
+Sleeping 2 seconds...
+Calling 'jobs'
+[ 2]   Running   sleep 5 &
+[ 3]   Running   sleep 10 &
+Sleeping 6 seconds...
+Calling 'jobs'
+[ 2]   Done      sleep 5 &
+[ 3]   Running   sleep 10 &
+Sleeping 3 seconds...
+Calling 'jobs'
+[ 3]   Done      sleep 10 &
+Calling 'jobs' again...
+Exiting...
+Total number of jobs: 14
+Total number of jobs in background: 12
+
+****** Test 2 ******
+
+
+
+ 
 
 
 Know Bugs and Limitations
