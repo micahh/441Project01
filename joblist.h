@@ -43,11 +43,30 @@ typedef struct job_t
 	struct job_t* next;				// next job in job list
 } job_t;
 
-int add_job(job_t* job); 			//add a job to the job list.
-int update_job_list_state();		// updates the state of each job in the job list.
-void print_job_list();				// print out job information for every job in the job list.
-int free_job();						// deallocates job object. returns zero if deallocation was sucessful.
-int clean_job_list();				// remove all completed jobs from job list. Jobs are deleted (de-allocated) when removed.
+//add a job to the job list.
+int add_job(job_t* job); 		
+
+// updates the state of each job in the job list.
+int update_job_list_state();		
+
+// print out job information for every job in the job list.
+void print_job_list();				
+
+/* de-allocates the job referenced by 'job'.
+ * Note: this function doesn't remove the job from the job list.
+ * 		 It is assumed to not belong to the joblist. remove_job 
+ * 		 should be used instead to remove  a job from the job list.
+ */
+int free_job();						
+
+/* removes the job 'job' from the list and frees the memory pointed to it. Previous must be the
+ * job immediately before 'job'.
+ * Returns non-zero if job couldn't be removed.
+ */
+int remove_job(job_t* prev,job_t* job);
+
+// remove all completed jobs from job list. Jobs are deleted (de-allocated) when removed.
+int clean_job_list();		
 
 
 

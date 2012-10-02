@@ -29,8 +29,13 @@ uint32_t get_next_job_number()
 	return ++job_counter;
 }
 
-int execute_job(job_t* job);
 
+/* list_jobs
+ * Description: Prints a summery of all jobs currently running in the background and those that have finished after the
+ * 				last invocation of this function.
+ * Parameters: None
+ * Returns: 0
+ */
 int list_jobs()
 {
 	//Print out the 'jobs' prompt for Part 1 of homework
@@ -44,6 +49,13 @@ int list_jobs()
 	return 0;
 }
 
+/* list_jobs
+ * Description: Prints a summery of all jobs that have been started since the time this program was started. The total jobs number is the count
+ * 				of every job started since the program began. The background job count is the number of jobs started in background regardless
+ * 				of there current state.
+ * Parameters: None
+ * Returns: 0
+ */
 int exit_notify()
 {
 	printf("Total number of jobs: %d\n",jobs_started);
@@ -51,6 +63,14 @@ int exit_notify()
 	// for part 2 will call into joblistc's list_jobs also
 	return 0;
 }
+
+/* execute_job
+ * 
+ * Description: Allocates argument list and invokes the execvp system call
+ * Parameters: 'job' - the job information structure to use to create new program.
+ * Return: returns the error code from execvp on error, otherwise this function does not return.
+ *
+ */
 
 int execute_job(job_t* job)
 {
@@ -67,6 +87,13 @@ int execute_job(job_t* job)
 	return execvp(prog_name,args);
 }
 
+
+/* start_job
+ * 
+ * Description: This function spawns a new child process and executes the command described in 'job'.
+ * Parameters: 'job' a job information structure that describes the command to execute.
+ * Returns: 0
+ */
 int start_job(job_t *job)
 {
 

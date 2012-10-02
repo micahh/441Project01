@@ -123,6 +123,17 @@ Total number of jobs: 14
 Total number of jobs in background: 12
 
 ****** Test 2 ******
+file: test2.sh
+command: cd tests; ../myshell test2.sh
+This test checks proper handling of multiple batch files. It also illustrates the behavior of the exit command with 
+multiple input files. The test2.sh script runs myshell with 3 input files:
+test2_input1.sh test2_input2.sh test2_input3.sh.
+Example output is located in the file tests/test2_results.txt
+
+The total number of jobs that the invoked instance runs (the innner shell) is 22 total jobs and 3 jobs in the background.
+The total number of jobs run for the outer shell (the one that invokes test2.sh) is 5.
+There is an echo command in input 3 that should never be executed on proper functioning of the 'exit' command.
+
 
 
 
