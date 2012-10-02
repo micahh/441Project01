@@ -7,7 +7,7 @@ Description
 
 Building
 ===================================================================================================
-A makefile is provide for compilation. It assumes a recent version of gcc is installed that supports the c99 standard. To build type:
+A makefile is provide for compilation. It assumes a recent version of gcc is installed that supports the c99 standard. The build was tested on Ubuntu Linux 12.04 with gcc 4.6.3. To build type:
 
 	make
 
@@ -29,7 +29,7 @@ To run in batch mode, invoke the program in the same manner followed by one or m
 
 	./myshell batch.sh batch2.sh batch3.sh
 
-Each file will be executed in sequence. If the 'exit' command is present in any of the files, the shell will immediately stop processing commands in the current file and proceed to process the next file (if any). After each script's exit command or end of file, the current job count will be displayed, but will not be reset for any succeeding scripts.
+Each file will be executed in sequence. If the 'exit' command is present in any of the files, the shell will immediately stop processing commands in the current file and proceed to process the next file (if any). After each script's exit command or end of file, the current job count will be displayed, but will not be reset for any succeeding scripts. The number of background jobs will also be displayed. This number should not be interpreted as the number of jobs currently running in the background, but rather the total number of jobs run in the background since the start of the program.
 
 Examples
 ===================================================================================================This is an example of a user 'jack' running myshell in interactive mode:
@@ -89,6 +89,11 @@ Example of interactive shell from Project01 documentation:
 	user@build:~/shared/os/441Project01$
 
 
+
+Tests
+===================================================================================================
+To ensure the proper functionality of your installation, you may run the test suite provided in the 'test' directory.
+The test suite consists of several batch scripts to run 
 
 
 Know Bugs and Limitations

@@ -104,7 +104,6 @@ int start_job(job_t *job)
 		int status = 0;
 		if(!parallel)
 		{
-			jobs_background++;
 			waitpid(c_pid,&status,0);
 			if(status != 0)
 			{
@@ -115,6 +114,7 @@ int start_job(job_t *job)
 		}
 		else
 		{
+			jobs_background++;
 			job->pid = c_pid;
 			job->job_state = RUNNING;
 			add_job(job);
